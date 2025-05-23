@@ -30,9 +30,9 @@
 
 
 
+import { useCart } from '@/context/CartContext'
 import React from 'react'
-import { View, Text, FlatList, Button } from 'react-native'
-import { useCart } from '../context/CartContext'
+import { Button, FlatList, Text, View } from 'react-native'
 
 export default function CartScreen() {
   const { cart, removeFromCart, clearCart } = useCart()

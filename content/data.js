@@ -8,41 +8,41 @@ export const categories = [
 
 export const products = [
   {
-    image: require("../assets/images/calcium-a.png"), // Add extension
+    image: require("@/assets/images/calcium-a.png"), // Add extension
     title: "Wireless Headphones",
     price: 129.99,
     category: "Hydration",
   },
   {
-    image: require("../assets/images/calcium-b.png"), // Add extension
+    image: require("@/assets/images/calcium-b.png"), // Add extension
 
     title: "Smartwatch Pro",
     price: 89.99,
     category: "Energy",
   },
   {
-    image: require("../assets/images/calcium-c.png"), // Add extension
+    image: require("@/assets/images/calcium-c.png"), // Add extension
 
     title: "Slim Laptop",
     price: 999.99,
     category: "Fatigue",
   },
   {
-    image: require("../assets/images/calcium-d.png"), // Add extension
+    image: require("@/assets/images/calcium-d.png"), // Add extension
 
     title: "Travel Backpack",
     price: 49.99,
     category: "Energy",
   },
   {
-    image: require("../assets/images/calcium-e.png"), // Add extension
+    image: require("@/assets/images/calcium-e.png"), // Add extension
 
     title: "Running Sneakers",
     price: 69.99,
     category: "Hydration",
   },
   {
-    image: require("../assets/images/calcium-a.png"), // Add extension
+    image: require("@/assets/images/calcium-a.png"), // Add extension
 
     title: "DSLR Camera",
     price: 549.0,

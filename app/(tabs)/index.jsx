@@ -125,7 +125,7 @@
 
 // import React from 'react'
 // import { View, Text, Button } from 'react-native'
-// // import { useAuth } from '../context/AuthContext'
+// // import { useAuth } from '@/context/AuthContext'
 // import { useRouter } from 'expo-router'
 // import { useAuth } from '@/context/AuthContext'
 
@@ -147,16 +147,25 @@
 //   )
 // }
 
+import ProductCard from "@/app/product/ProductCard";
 import ChipsFilter from "@/components/body/ChipsFilter";
-import Heading from "@/components/body/Heading";
 import SearchBar from "@/components/body/SearchBar";
-import ProductCard from "@/components/product/ProductCard";
 import { categories, products } from "@/content/data";
-import { Alert, FlatList, StyleSheet, View } from "react-native";
 import { LinearGradient } from "expo-linear-gradient";
+import {
+  Alert,
+  Dimensions,
+  FlatList,
+  ScrollView,
+  StyleSheet,
+  View,
+} from "react-native";
 
-import { useState } from "react";
+import Heading from "@/components/body/Heading";
 import ImageSlider from "@/components/body/ImageSlider";
+import { useState } from "react";
+
+const { width, height } = Dimensions.get("screen");
 
 export default function HomeScreen() {
   const [selectedCategory, setSelectedCategory] = useState("All");
@@ -172,14 +181,14 @@ export default function HomeScreen() {
 
   return (
     <LinearGradient colors={["#c4def6", "#1273de"]} style={styles.background}>
-      <View>
-        <View >
+      <ScrollView>
+        <View style={styles.slider}>
           <ImageSlider />
         </View>
 
-        {/* <View>
+        <View style={styles.SearchBar}>
           <SearchBar onSearch={handleSearch} />
-        </View> */}
+        </View>
 
         {/* <View style={styles.categoryBox}>
           <ChipsFilter
@@ -206,7 +215,7 @@ export default function HomeScreen() {
             )}
           />
         </View> */}
-      </View>
+      </ScrollView>
     </LinearGradient>
   );
 }
@@ -215,6 +224,12 @@ const styles = StyleSheet.create({
   allProducts: {
     // paddingHorizontal: 10,
     gap: 5,
+  },
+  slider: {
+    // height: height / 8,
+    // height: 0.28,  // crucial for proper sizing
+    marginBottom: 10,
+    // backgroundColor: "#fff", // optional for debug
   },
   container: {
     flex: 1,

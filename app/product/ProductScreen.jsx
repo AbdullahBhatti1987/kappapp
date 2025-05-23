@@ -3,7 +3,7 @@ import { View, Text, Image, ScrollView, StyleSheet, TouchableOpacity, Dimensions
 import { MaterialIcons, Ionicons } from '@expo/vector-icons';
 import { useNavigation } from '@react-navigation/native';
 
-const { width } = Dimensions.get('screen');
+const { width } = Dimensions.get('window');
 
 const ProductScreen = ({ route }) => {
   const { product } = route.params;
@@ -127,7 +127,7 @@ const styles = StyleSheet.create({
   mainImage: {
     width: width,
     height: width * 0.8,
-  },
+  },  
   thumbnailContainer: {
     flexDirection: 'row',
     justifyContent: 'center',

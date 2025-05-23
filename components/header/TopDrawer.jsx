@@ -1,22 +1,26 @@
+import { useDrawer } from "@/context/DrawerContext";
+import MaterialIcons from "@expo/vector-icons/MaterialIcons";
 import React from "react";
 import {
   Animated,
   Dimensions,
-  StyleSheet,
-  View,
-  Text,
   Pressable,
+  StyleSheet,
+  Text,
+  View,
 } from "react-native";
-import { useDrawer } from "@/context/DrawerContext";
-import MaterialIcons from "@expo/vector-icons/MaterialIcons";
 
-const SCREEN_WIDTH = Dimensions.get("screen").width;
+const SCREEN_WIDTH = Dimensions.get("window").width;
 
 export default function TopDrawer() {
   const { slideAnim, closeDrawer } = useDrawer();
 
+
   return (
-    <Animated.View style={[styles.drawer, { left: slideAnim }]}>
+    <Animated.View style={[styles.drawer, { left: slideAnim }]}
+    
+     onDismiss={closeDrawer}
+     >
       <View style={styles.closeButtonBox}>
         <Text style={styles.heading}>Heading</Text>
         <Pressable style={styles.close} onPress={closeDrawer}>

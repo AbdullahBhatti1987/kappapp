@@ -8,9 +8,8 @@ import {
     Text,
     View,
 } from "react-native";
-import Swipeable from "react-native-gesture-handler/Swipeable";
 
-const SCREEN_WIDTH = Dimensions.get("screen").width;
+const SCREEN_WIDTH = Dimensions.get("window").width;
 
 export default function CartItem({ item, onDelete }) {
 

@@ -1,5 +1,4 @@
 import { slides } from '@/content/data';
-import { useHeaderHeight } from '@react-navigation/elements';
 import React, { useEffect, useRef, useState } from 'react';
 import {
   Dimensions,
@@ -11,35 +10,34 @@ import {
   View,
 } from 'react-native';
 
-const { width, height } = Dimensions.get('screen');
+const { SCREEN_WIDTH, SCREEN_HEIGHT } = Dimensions.get('screen');
+
 
 const ImageSlider = () => {
   const [activeSlide, setActiveSlide] = useState(0);
   const scrollViewRef = useRef(null);
-  const headerHeight = useHeaderHeight();
 
   useEffect(() => {
     const interval = setInterval(() => {
       const nextSlide = (activeSlide + 1) % slides.length;
       setActiveSlide(nextSlide);
       scrollViewRef.current?.scrollTo({
-        x: nextSlide * width,
+        x: nextSlide * SCREEN_WIDTH,
         animated: true,
       });
-    }, 5000); // slower transition (5 seconds)
-
+    }, 5000);
     return () => clearInterval(interval);
   }, [activeSlide]);
 
   const handleSlideChange = (event) => {
-    const slide = Math.round(event.nativeEvent.contentOffset.x / width);
+    const slide = Math.round(event.nativeEvent.contentOffset.x / SCREEN_WIDTH);
     if (slide !== activeSlide) {
       setActiveSlide(slide);
     }
   };
 
   return (
-    <View style={[styles.container, { marginTop: headerHeight }]}>
+    <View style={styles.container}>
       <ScrollView
         ref={scrollViewRef}
         horizontal
@@ -50,11 +48,11 @@ const ImageSlider = () => {
       >
         {slides?.map((slide) => (
           <View key={slide.id} style={styles.slide}>
-            <Image source={slide.image} style={styles.image} resizeMode="cover" />
             <View style={styles.textContainer}>
               <Text style={styles.title}>{slide.title}</Text>
               <Text style={styles.description}>{slide.description}</Text>
             </View>
+            <Image source={slide.image} style={styles.image} resizeMode="contain" />
           </View>
         ))}
       </ScrollView>
@@ -66,14 +64,14 @@ const ImageSlider = () => {
             style={[
               styles.paginationDot,
               {
-                backgroundColor: index === activeSlide ? '#fff' : 'rgba(255,255,255,0.4)',
+                backgroundColor: index === activeSlide ? '#fff' : 'rgba(255,255,255,0.2)',
                 transform: [{ scale: index === activeSlide ? 1.2 : 1 }],
               },
             ]}
             onPress={() => {
               setActiveSlide(index);
               scrollViewRef.current?.scrollTo({
-                x: index * width,
+                x: index * SCREEN_WIDTH,
                 animated: true,
               });
             }}
@@ -86,62 +84,63 @@ const ImageSlider = () => {
 
 const styles = StyleSheet.create({
   container: {
-    height: height * 0.28,
+    height: SCREEN_HEIGHT / 10,
+    // height: 160, // Fixed height
     borderRadius: 15,
     overflow: 'hidden',
-    // marginHorizontal: 10,
+    backgroundColor: '#1E1E1E',
   },
   scrollView: {
-    flex: 1,
+    flexGrow: 0, // Prevent stretching
   },
   slide: {
-    width,
-    height: height * 0.28,
-    justifyContent: 'center',
+    width: SCREEN_WIDTH, 
+    height: SCREEN_HEIGHT / 10,
+    flexDirection: 'row',
     alignItems: 'center',
-  },
-  image: {
-    width: '100%',
-    height: '100%',
-    borderRadius: 15,
+    justifyContent: 'space-between',
+    paddingHorizontal: 10,
+    overflow: 'hidden'
   },
   textContainer: {
-    position: 'absolute',
-    width: width / 3,
-    bottom: 15,
-    left: 20,
-    top: 20,
-    right: 20,
-    backgroundColor: 'rgba(0,0,0,0.4)',
-    paddingVertical: 8,
+    width: '50%',
+    justifyContent: 'center',
     paddingHorizontal: 10,
-    borderRadius: 10,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 1 },
-    shadowOpacity: 0.3,
-    shadowRadius: 3,
   },
   title: {
-    fontSize: 18,
+    fontSize: 16,
     fontWeight: 'bold',
     color: '#fff',
+    marginBottom: 6,
   },
   description: {
     fontSize: 14,
-    color: '#eee',
+    color: '#ccc',
+  },
+  image: {
+    width: '50%',
+    height: '80%', 
+    resizeMode: 'contain',
+    borderRadius: 10,
+    alignSelf: 'center',
   },
   pagination: {
     position: 'absolute',
     bottom: 10,
+    left: 0,
+    right: 0,
     flexDirection: 'row',
-    alignSelf: 'center',
+    justifyContent: 'center',
+    alignItems: 'center',
   },
   paginationDot: {
-    width: 10,
-    height: 10,
+    width: 7,
+    height: 7,
     borderRadius: 5,
-    marginHorizontal: 5,
+    marginHorizontal: 4,
+    backgroundColor: 'rgba(255,255,255,0.4)',
   },
 });
+
 
 export default ImageSlider;

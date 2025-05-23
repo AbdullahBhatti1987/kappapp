@@ -1,5 +1,4 @@
-import React from 'react'
-import { Text, View, StyleSheet } from 'react-native'
+import { StyleSheet, Text, View } from 'react-native'
 
 function Heading({ text }) {
   return (
@@ -9,7 +8,6 @@ function Heading({ text }) {
   )
 }
 
-export default Heading
 
 const styles = StyleSheet.create({
   container: {
@@ -23,3 +21,6 @@ const styles = StyleSheet.create({
     letterSpacing: 0.5,
   },
 })
+
+
+export default Heading

@@ -45,11 +45,11 @@
 
 
 
-import React, { useEffect, useState } from 'react'
-import { View, Text, Image, Button, ScrollView } from 'react-native'
+import { useCart } from '@/context/CartContext'
 import axios from 'axios'
-import { useSearchParams, useRouter } from 'expo-router'
-import { useCart } from '../context/CartContext'
+import { useRouter, useSearchParams } from 'expo-router'
+import React, { useEffect, useState } from 'react'
+import { Button, Image, ScrollView, Text } from 'react-native'
 
 export default function ProductDetails() {
   const { productId } = useSearchParams()
