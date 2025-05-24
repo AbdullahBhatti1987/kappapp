@@ -421,17 +421,16 @@
 //   },
 // });
 
+// =====================================================================================
 
 import Button from "@/components/Button";
-import API from "@/utils/api";
-import AsyncStorage from "@react-native-async-storage/async-storage";
 import { Link, useRouter } from "expo-router";
-import React, { useState } from "react";
+import React, { useContext, useRef, useState } from "react";
 import {
   ActivityIndicator,
-  Alert,
   Dimensions,
   Image,
+  Keyboard,
   KeyboardAvoidingView,
   Modal,
   Platform,
@@ -441,8 +440,12 @@ import {
   TextInput,
   TouchableWithoutFeedback,
   View,
-  Keyboard,
 } from "react-native";
+import MaterialIcons from "@expo/vector-icons/MaterialIcons";
+import API from "@/utils/api";
+import { AuthContext } from "@/context/AuthContext";
+import basicColors from "@/content/globalcss";
+import { setAuthData } from "@/utils/storage";
 
 const { width, height } = Dimensions.get("window");
 
@@ -452,62 +455,138 @@ export default function RegisterScreen() {
   const [name, setName] = useState("");
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
+  const [nameFocused, setNameFocused] = useState(false);
+  const [emailFocused, setEmailFocused] = useState(false);
+  const [passwordFocused, setPasswordFocused] = useState(false);
+  const [nameError, setNameError] = useState("");
+  const [emailError, setEmailError] = useState("");
+  const [passwordError, setPasswordError] = useState("");
+
   const router = useRouter();
 
+  const emailRef = useRef(null);
+  const passwordRef = useRef(null);
 
-const handleRegister = async () => {
-  setError("");
-  setLoading(true);
-  
-  try {
-    const res = await API.post("/auth/register", { name, email, password });
-    
-    if (!res.data) {
-      throw new Error("No data received from server");
+  //   const handleRegister = async () => {
+  //     setError("");
+  //     setNameError("");
+  //     setEmailError("");
+  //     setPasswordError("");
+
+  //     let valid = true;
+
+  //     if (!name.trim()) {
+  //       setNameError("Full name is required");
+  //       valid = false;
+  //     }
+
+  //     if (!email.trim()) {
+  //       setEmailError("Email is required");
+  //       valid = false;
+  //     } else if (!/\S+@\S+\.\S+/.test(email)) {
+  //       setEmailError("Enter a valid email");
+  //       valid = false;
+  //     }
+
+  //     if (!password.trim()) {
+  //       setPasswordError("Password is required");
+  //       valid = false;
+  //     } else if (password.length < 6) {
+  //       setPasswordError("Password must be at least 6 characters");
+  //       valid = false;
+  //     }
+
+  //     if (!valid) return;
+
+  //     setLoading(true);
+
+  //    try {
+  //   const res = await API.post("/auth/register", { name, email, password });
+
+  //   const { token, user } = res.data;
+  //   await AsyncStorage.multiSet([
+  //     ["token", token],
+  //     ["user", JSON.stringify(user)],
+  //   ]);
+
+  //   Alert.alert("Success", "Registration successful!");
+  //   router.replace("/(tabs)");
+  // } catch (err) {
+  //   console.error("Registration error:", err);
+
+  //   // Check if backend sent a specific error message
+  //   if (err.response && err.response.status === 400) {
+  //     setError(err.response.data.message); // This will be "Email already exists"
+  //   } else {
+  //     setError("Registration failed. Please try again.");
+  //   }
+  // } finally {
+  //   setLoading(false);
+  // }
+
+  //   };
+
+  const { setUser, setToken, setIsLogin } = useContext(AuthContext);
+
+  const handleRegister = async () => {
+    setError("");
+    setNameError("");
+    setEmailError("");
+    setPasswordError("");
+
+    let valid = true;
+
+    if (!name.trim()) {
+      setNameError("Full name is required");
+      valid = false;
     }
 
-    const { token, user } = res.data;
-
-    // Validate token and user before storing
-    if (!token || !user) {
-      throw new Error("Invalid response from server - missing token or user data");
+    if (!email.trim()) {
+      setEmailError("Email is required");
+      valid = false;
+    } else if (!/\S+@\S+\.\S+/.test(email)) {
+      setEmailError("Enter a valid email");
+      valid = false;
     }
 
-    await AsyncStorage.multiSet([
-      ['token', token],
-      ['user', JSON.stringify(user)]
-    ]);
-
-    Alert.alert("Success", "Registration successful!");
-    router.replace("/(tabs)"); // Note the forward slash
-  } catch (err) {
-    console.error("Registration error:", err); // Log the full error for debugging
-    
-    // More specific error handling
-    let message = "Registration failed.";
-    if (err.response) {
-      // Server responded with error status
-      message = err.response.data?.message || err.response.statusText || message;
-    } else if (err.request) {
-      // Request was made but no response
-      message = "No response from server";
-    } else {
-      // Something else happened
-      message = err.message || message;
+    if (!password.trim()) {
+      setPasswordError("Password is required");
+      valid = false;
+    } else if (password.length < 6) {
+      setPasswordError("Password must be at least 6 characters");
+      valid = false;
     }
-    
-    setError(message);
-    
-    // Clear any potentially invalid storage
+
+    if (!valid) return;
+
+    setLoading(true);
+
     try {
-      await AsyncStorage.multiRemove(['token', 'user']);
-    } catch (storageErr) {
-      console.error("Failed to clear storage:", storageErr);
+      const res = await API.post("/auth/register", { name, email, password });
+
+      const { token, user } = res.data;
+      if (!token || !user) throw new Error("Invalid response");
+
+      await setAuthData(token, user);
+      setUser(user);
+      setToken(token);
+      setIsLogin(true);
+
+      Alert.alert("Success", "Registration successful!");
+      router.replace("/(tabs)");
+    } catch (err) {
+      if (err.response?.status === 400 && err.response.data?.message) {
+        setError(err.response.data.message);
+      } else {
+        setError("Registration failed. Please try again.");
+      }
+    } finally {
+      setLoading(false);
     }
-  } finally {
-    setLoading(false);
-  }
-};
+  };
+  const handleBack = () => {
+    router.replace("/welcome");
+  };
 
   return (
     <KeyboardAvoidingView
@@ -515,6 +594,15 @@ const handleRegister = async () => {
       style={styles.mainContainer}
       keyboardVerticalOffset={Platform.OS === "ios" ? 60 : 0}
     >
+      <View>
+        <MaterialIcons
+          name="arrow-back"
+          onPress={handleBack}
+          style={styles.backButton}
+          size={28}
+          color="black"
+        />
+      </View>
       <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
         <ScrollView
           contentContainerStyle={styles.scrollContainer}
@@ -538,53 +626,69 @@ const handleRegister = async () => {
                 }}
               />
             </View>
-
             {/* Heading */}
             <Text style={styles.heading}>Register</Text>
-
             {/* Form Inputs */}
             <TextInput
               placeholder="Full Name"
               value={name}
               onChangeText={setName}
-              style={styles.input}
+              style={[styles.input, nameFocused && styles.inputFocused]}
               returnKeyType="next"
+              onSubmitEditing={() => emailRef.current.focus()}
+              blurOnSubmit={false}
+              onFocus={() => setNameFocused(true)}
+              onBlur={() => setNameFocused(false)}
             />
+            {nameError ? <Text style={styles.error}>{nameError}</Text> : null}
+
             <TextInput
+              ref={emailRef}
               placeholder="Email"
               value={email}
               onChangeText={setEmail}
               keyboardType="email-address"
-              style={styles.input}
+              style={[styles.input, emailFocused && styles.inputFocused]}
               autoCapitalize="none"
               returnKeyType="next"
+              onSubmitEditing={() => passwordRef.current.focus()}
+              blurOnSubmit={false}
+              onFocus={() => setEmailFocused(true)}
+              onBlur={() => setEmailFocused(false)}
             />
+            {emailError ? <Text style={styles.error}>{emailError}</Text> : null}
+
             <TextInput
+              ref={passwordRef}
               placeholder="Password"
               value={password}
               onChangeText={setPassword}
               secureTextEntry
-              style={styles.input}
+              style={[styles.input, passwordFocused && styles.inputFocused]}
               returnKeyType="done"
               onSubmitEditing={handleRegister}
+              onFocus={() => setPasswordFocused(true)}
+              onBlur={() => setPasswordFocused(false)}
             />
-            {!!error && <Text style={styles.error}>{error}</Text>}
+            {passwordError ? (
+              <Text style={styles.error}>{passwordError}</Text>
+            ) : null}
 
+            {!!error && <Text style={styles.error}>{error}</Text>}
             <Button
               title="Register"
               onPress={handleRegister}
               disabled={false}
               loading={loading}
             />
-
             {/* Link */}
             <View style={styles.linkRow}>
               <Text>Already have an account? </Text>
               <Link href="/auth/login" style={styles.link}>
                 Login
               </Link>
+              {/* {router.replace('/auth/login')} */}
             </View>
-
             {/* Loading Modal */}
             <Modal visible={loading} transparent animationType="fade">
               <View style={styles.loadingOverlay}>
@@ -602,13 +706,18 @@ const handleRegister = async () => {
 }
 
 const styles = StyleSheet.create({
-  mainContainer: { flex: 1 },
+  mainContainer: { flex: 1, backgroundColor: "white" },
   scrollContainer: { flexGrow: 1, justifyContent: "center" },
-  container: { 
+  container: {
     flex: 1,
     justifyContent: "center",
     padding: 20,
-    paddingBottom: 40 // Add extra padding at bottom for keyboard
+    paddingBottom: 40, // Add extra padding at bottom for keyboard
+  },
+  backButton: {
+    top: 20,
+    left: 10,
+    padding: 10,
   },
   heading: {
     fontSize: 24,
@@ -619,9 +728,15 @@ const styles = StyleSheet.create({
   input: {
     borderWidth: 1,
     borderColor: "#ccc",
-    marginBottom: 15,
-    padding: 10,
+    marginBottom: 10,
+    paddingVertical: 10,
+    paddingHorizontal: 12, // instead of padding & paddingLeft
     borderRadius: 5,
+    backgroundColor: "white",
+  },
+  inputFocused: {
+    borderColor: basicColors.themeColor,
+    backgroundColor: "#fff",
   },
   error: { color: "red", marginBottom: 10, textAlign: "center" },
   linkRow: { flexDirection: "row", marginTop: 10, justifyContent: "center" },

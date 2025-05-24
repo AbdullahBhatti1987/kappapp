@@ -1,3 +1,4 @@
+import basicColors from '@/content/globalcss';
 import React from 'react';
 import { StyleSheet, TouchableOpacity, Text } from 'react-native';
 
@@ -22,9 +23,8 @@ function Button({ title, onPress, disabled, loading, style }) {
 const styles = StyleSheet.create({
   button: {
     borderRadius: 10,
-    width: '100%',
     height: 45,
-    backgroundColor: '#42a5f5',
+    backgroundColor: basicColors.themeColor,
     justifyContent: 'center',
     alignItems: 'center',
     color: 'white',

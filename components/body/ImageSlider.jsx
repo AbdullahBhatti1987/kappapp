@@ -10,7 +10,7 @@ import {
   View,
 } from 'react-native';
 
-const { SCREEN_WIDTH, SCREEN_HEIGHT } = Dimensions.get('screen');
+const { SCREEN_WIDTH, SCREEN_HEIGHT } = Dimensions.get('window');
 
 
 const ImageSlider = () => {
@@ -84,10 +84,9 @@ const ImageSlider = () => {
 
 const styles = StyleSheet.create({
   container: {
-    height: SCREEN_HEIGHT / 10,
+    height: SCREEN_HEIGHT / 4,
     // height: 160, // Fixed height
     borderRadius: 15,
-    overflow: 'hidden',
     backgroundColor: '#1E1E1E',
   },
   scrollView: {
@@ -95,7 +94,7 @@ const styles = StyleSheet.create({
   },
   slide: {
     width: SCREEN_WIDTH, 
-    height: SCREEN_HEIGHT / 10,
+    height: SCREEN_HEIGHT / 4,
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',

@@ -40,43 +40,46 @@ const styles = StyleSheet.create({
     marginTop: 10,
     // paddingHorizontal: 15,
     // backgroundColor: 'salmon',
+    gap: 4,
   },
- chip: {
-  paddingHorizontal: 15,
-  // paddingVertical: 10,
-  // backgroundColor: "rgba(255, 255, 255, 0.50)",
-  borderRadius: 25,
-  // marginRight: 12,
-  // borderColor: "#1273de",
-  // borderWidth: 1,
-  // shadowColor: "#007AFF",
-  // shadowOffset: { width: 0, height: 2 },
-  // shadowOpacity: 0.50,
-  // shadowRadius: 4,
-  // elevation: 5, // for Android
-  flexDirection: "row",
-  alignItems: "center",
-  gap: 4,
-},
-chipText: {
-  color: "#007AFF",
-  fontWeight: "600",
-  fontSize: 14,
-},
-
-selectedChip: {
-  backgroundColor: "#1273de",
-  fontWeight: "800",
-  fontSize: 14,
-  padding: 5,
-
+  chip: {
+    paddingHorizontal: 15,
+    // paddingVertical: 10,
+    // backgroundColor: "rgba(255, 255, 255, 0.50)",
+    borderRadius: 25,
+    // marginRight: 8,
+    // borderColor: "#1273de",
+    // borderWidth: 1,
+    fontWeight: "bold",
+    // shadowColor: "#007AFF",
+    // shadowOffset: { width: 0, height: 2 },
+    // shadowOpacity: 0.50,
+    // shadowRadius: 4,
+    // elevation: 5, // for Android
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 4,
   },
   chipText: {
-    color: "#333",
+    color: "gray",
+    fontWeight: "bold",
     fontSize: 14,
   },
+
+  selectedChip: {
+    // backgroundColor: "#1273de",
+    fontWeight: "bold",
+    // color: "black",
+    fontSize: 14,
+    padding: 5,
+  },
+
   selectedChipText: {
-    color: "#fff",
+     color: "black",
+    // color: "#fff",
     fontWeight: "600",
+    textDecorationLine: 'underline',
+    textDecorationStyle: 'solid',
+    lineHeight: 10,
   },
 });

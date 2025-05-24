@@ -66,13 +66,13 @@
 //   return context
 // }
 
+
 import API from "@/utils/api";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { router } from "expo-router";
 import React, { createContext, useContext, useEffect, useState } from "react";
-import { Alert } from "react-native";
 
-const AuthContext = createContext(undefined);
+export const AuthContext = createContext();
 
 export const AuthProvider = ({ children }) => {
   const [user, setUser] = useState(null);
@@ -87,7 +87,7 @@ export const AuthProvider = ({ children }) => {
         // Optionally fetch user data using the token
         router.replace("/"); // redirect to home or welcome
       } else {
-        router.replace("/auth/login"); // stay on login if not logged in
+        // router.replace("/auth/login"); // stay on login if not logged in
       }
       setLoading(false);
     };
@@ -95,33 +95,86 @@ export const AuthProvider = ({ children }) => {
     loadUser();
   }, []);
 
-  const login = async (email, password) => {
-    const res = await API.post("/auth/login", { email, password });
-    setToken(res.data.token);
-    setUser({
-      userId: res.data.userId,
-      name: res.data.name,
-      email: res.data.email,
-    });
-    await AsyncStorage.setItem("token", res.data.token);
-    router.replace("/"); // Navigate to home or welcome screen after login
-  };
 
-  const logout = async () => {
-    try {
-      setUser(null);
-      setToken(null);
-      await AsyncStorage.removeItem("token");
-      Alert.alert("Logout successful");
-      router.replace("/auth/login"); // adjust if needed
-    } catch (error) {
-      console.error("Logout failed:", error);
-    }
-  };
 
-  const register = async (name, email, password) => {
-    const res = await API.post("/auth/register", { name, email, password });
-  };
+  //   const register = async (name, email, password) => {
+  //   const res = await API.post("/auth/register", { name, email, password });
+  //   try {
+  //       const res = await API.post("/auth/register", { name, email, password });
+        
+  //       if (!res.data) {
+  //         throw new Error("No data received from server");
+  //       }
+    
+  //       const { token, user } = res.data;
+    
+  //       // Validate token and user before storing
+  //       if (!token || !user) {
+  //         throw new Error("Invalid response from server - missing token or user data");
+  //       }
+    
+  //       await AsyncStorage.multiSet([
+  //         ['token', token],
+  //         ['user', JSON.stringify(user)]
+  //       ]);
+    
+  //       Alert.alert("Success", "Registration successful!");
+  //       router.replace("/(tabs)"); // Note the forward slash
+  //     } catch (err) {
+  //       console.error("Registration error:", err); // Log the full error for debugging
+        
+  //       // More specific error handling
+  //       let message = "Registration failed.";
+  //       if (err.response) {
+  //         // Server responded with error status
+  //         message = err.response.data?.message || err.response.statusText || message;
+  //       } else if (err.request) {
+  //         // Request was made but no response
+  //         message = "No response from server";
+  //       } else {
+  //         // Something else happened
+  //         message = err.message || message;
+  //       }
+        
+  //       setError(message);
+        
+  //       // Clear any potentially invalid storage
+  //       try {
+  //         await AsyncStorage.multiRemove(['token', 'user']);
+  //       } catch (storageErr) {
+  //         console.error("Failed to clear storage:", storageErr);
+  //       }
+  //     } finally {
+  //       setLoading(false);
+  //     }
+  // };
+
+
+  // const login = async (email, password) => {
+  //   const res = await API.post("/auth/login", { email, password });
+  //   setToken(res.data.token);
+  //   setUser({
+  //     userId: res.data.userId,
+  //     name: res.data.name,
+  //     email: res.data.email,
+  //   });
+  //   await AsyncStorage.setItem("token", res.data.token);
+  //   router.replace("/"); // Navigate to home or welcome screen after login
+  // };
+
+  // const logout = async () => {
+  //   try {
+  //     setUser(null);
+  //     setToken(null);
+  //     await AsyncStorage.removeItem("token");
+  //     Alert.alert("Logout successful");
+  //     router.replace("/auth/login"); // adjust if needed
+  //   } catch (error) {
+  //     console.error("Logout failed:", error);
+  //   }
+  // };
+
+
 
   return (
     <AuthContext.Provider
@@ -129,9 +182,11 @@ export const AuthProvider = ({ children }) => {
         user,
         setUser,
         token,
-        login,
-        logout,
-        register,
+        // login,
+        // logout,
+        // register,
+        token,
+        setToken,
         loading,
         setLoading,
       }}

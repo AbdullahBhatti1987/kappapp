@@ -11,22 +11,35 @@ export default function Index() {
   const { setUser } = useAuth();
 
   useEffect(() => {
-    const checkUser = async () => {
-      try {
-        const storedUser = await AsyncStorage.getItem("user");
-        if (storedUser) {
-          setUser(JSON.parse(storedUser));
-          console.log("storedUser=>", storedUser)
-          router.replace("/welcome"); // Show welcome
-        } else {
-          router.replace("/(tabs)"); // Go to tabs if user exists
-        }
-      } catch (error) {
-        console.error("Error checking user:", error);
-        router.replace("/welcome");
-      }
-    };
-
+    // const checkUser = async () => {
+    //   try {
+    //     const storedUser = await AsyncStorage.getItem("user");
+    //     if (storedUser) {
+    //       setUser(JSON.parse(storedUser));
+    //       console.log("storedUser=>", storedUser)
+    //       router.replace("/welcome"); // Show welcome
+    //     } else {
+    //       router.replace("/(tabs)"); // Go to tabs if user exists
+    //     }
+    //   } catch (error) {
+    //     console.error("Error checking user:", error);
+    //     router.replace("/welcome");
+    //   }
+    // };
+const checkUser = async () => {
+  try {
+    const storedUser = await AsyncStorage.getItem("user");
+    if (storedUser) {
+      setUser(JSON.parse(storedUser));
+      router.replace("/(tabs)"); // Go to tabs if user exists
+    } else {
+      router.replace("/welcome"); // Show welcome
+    }
+  } catch (error) {
+    console.error("Error checking user:", error);
+    router.replace("/welcome");
+  }
+};
     checkUser();
   }, []);
 

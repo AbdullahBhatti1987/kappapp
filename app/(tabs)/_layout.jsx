@@ -76,8 +76,6 @@
 //   )
 // }
 
-
-
 // import { AuthProvider, useAuth } from "@/context/AuthContext";
 // import { CartProvider } from "@/context/CartContext";
 // import { useColorScheme } from "@/hooks/useColorScheme";
@@ -146,10 +144,10 @@
 //       <AuthProvider>
 //         <CartProvider>
 //           <Stack>
-//             <Stack.Screen 
-//               name="index" 
-//               options={{ headerShown: false }} 
-//               component={WelcomeScreen} 
+//             <Stack.Screen
+//               name="index"
+//               options={{ headerShown: false }}
+//               component={WelcomeScreen}
 //             />
 //             <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
 //             <Stack.Screen name="welcome" options={{ title: "Welcome", headerShown: false }} />
@@ -167,20 +165,18 @@
 //   );
 // }
 
-
 // app/index.tsx
 
 // app/(tabs)/_layout.tsx
 
-import { Tabs } from 'expo-router';
-import { Platform } from 'react-native';
-import { IconSymbol } from '@/components/ui/IconSymbol';
-import TabBarBackground from '@/components/ui/TabBarBackground';
-import { HapticTab } from '@/components/HapticTab';
-import { useColorScheme } from '@/hooks/useColorScheme';
-import { Colors } from '@/constants/Colors';
-import Header from '@/components/header/Header';
-
+import { HapticTab } from "@/components/HapticTab";
+import Header from "@/components/header/Header";
+import TabBarBackground from "@/components/ui/TabBarBackground";
+import basicColors from "@/content/globalcss";
+import { useColorScheme } from "@/hooks/useColorScheme";
+import MaterialIcons from "@expo/vector-icons/MaterialIcons";
+import { Tabs } from "expo-router";
+import { Platform } from "react-native";
 
 export default function TabsLayout() {
   const colorScheme = useColorScheme();
@@ -188,32 +184,52 @@ export default function TabsLayout() {
   return (
     <Tabs
       screenOptions={{
-        tabBarActiveTintColor: Colors[colorScheme ?? 'light'].tint,
+        tabBarActiveTintColor: basicColors.themeColor,
+        tabBarInactiveTintColor: basicColors.grayTabs,
         headerShown: true,
         tabBarButton: HapticTab,
         tabBarBackground: TabBarBackground,
         header: () => <Header />,
         tabBarStyle: Platform.select({
-          ios: { position: 'absolute' },
+          ios: { position: "absolute" },
           default: {},
         }),
       }}
+     
     >
       <Tabs.Screen
         name="index"
         options={{
-          title: 'Home',
+          title: "Home",
           tabBarIcon: ({ color }) => (
-            <IconSymbol size={28} name="house.fill" color={color} />
+            <MaterialIcons name="home" size={28} color={color} />
           ),
         }}
       />
       <Tabs.Screen
-        name="explore"
+        name="categories"
         options={{
-          title: 'Explore',
+          title: "Categroies",
           tabBarIcon: ({ color }) => (
-            <IconSymbol size={28} name="paperplane.fill" color={color} />
+            <MaterialIcons name="category" size={28} color={color} />
+          ),
+        }}
+      />
+      <Tabs.Screen
+        name="cart"
+        options={{
+          title: "Cart",
+          tabBarIcon: ({ color }) => (
+            <MaterialIcons name="shopping-cart" size={28} color={color} />
+          ),
+        }}
+      />
+      <Tabs.Screen
+        name="account"
+        options={{
+          title: "Account",
+          tabBarIcon: ({ color }) => (
+            <MaterialIcons name="account-circle" size={28} color={color} />
           ),
         }}
       />

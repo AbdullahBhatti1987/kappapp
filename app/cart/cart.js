@@ -1,98 +1,180 @@
-import { useNavigation } from '@react-navigation/native'
-import { useEffect, useState } from 'react'
-import { ActivityIndicator, Button, FlatList, Image, Text, TouchableOpacity, View } from 'react-native'
-import api from '@/utils/api'
+import { useNavigation } from "@react-navigation/native";
+import { useEffect, useState } from "react";
+import {
+  ActivityIndicator,
+  Button,
+  FlatList,
+  Image,
+  Text,
+  TouchableOpacity,
+  View,
+  StyleSheet,
+} from "react-native";
+import api from "@/utils/api";
 
 const CartScreen = () => {
-  const [cartItems, setCartItems] = useState([])
-  const [loading, setLoading] = useState(true)
-  const navigation = useNavigation()
+  const [cartItems, setCartItems] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const navigation = useNavigation();
 
   const fetchCart = async () => {
     try {
-      const res = await api.get('/cart')
-      setCartItems(res.data)
+      const res = await api.get("/cart");
+      const items = Array.isArray(res.data) ? res.data : res.data.cart || [];
+      setCartItems(items);
     } catch (err) {
-      console.error('Error fetching cart:', err)
+      console.error("Error fetching cart:", err);
+      setCartItems([]);
     } finally {
-      setLoading(false)
+      setLoading(false);
     }
-  }
+  };
 
   const removeItem = async (id) => {
     try {
-      await api.delete(`/cart/${id}`)
-      setCartItems(cartItems.filter(item => item._id !== id))
+      await api.delete(`/cart/${id}`);
+      setCartItems((prevItems) => prevItems.filter((item) => item._id !== id));
     } catch (err) {
-      console.error('Error removing item:', err)
+      console.error("Error removing item:", err);
     }
-  }
+  };
 
   useEffect(() => {
-    fetchCart()
-  }, [])
+    fetchCart();
+  }, []);
 
-  const total = cartItems.reduce((acc, item) => acc + item.price * item.quantity, 0)
+  const total = cartItems.reduce(
+    (acc, item) => acc + item.price * item.quantity,
+    0
+  );
 
   if (loading) {
     return (
-      <View className="flex-1 justify-center items-center">
+      <View style={styles.centered}>
         <ActivityIndicator size="large" />
       </View>
-    )
+    );
   }
 
   return (
-    <View className="flex-1 p-4">
-      <Text className="text-2xl font-bold mb-4">Your Cart</Text>
+    <View style={styles.container}>
+      <Text style={styles.title}>Your Cart</Text>
 
       {cartItems.length === 0 ? (
-        <View className="flex-1 justify-center items-center">
-          <Text className="text-lg mb-4">Your cart is empty</Text>
-          <Button 
-            title="Continue Shopping" 
-            onPress={() => navigation.navigate('Home')}
+        <View style={styles.centered}>
+          <Text style={styles.emptyText}>Your cart is empty</Text>
+          <Button
+            title="Continue Shopping"
+            onPress={() => navigation.navigate("Home")}
           />
         </View>
       ) : (
         <>
           <FlatList
             data={cartItems}
-            keyExtractor={item => item._id}
+            keyExtractor={(item) => item._id}
             renderItem={({ item }) => (
-              <View className="flex-row items-center mb-4 pb-4 border-b border-gray-200">
-                <Image 
-                  source={{ uri: item.image }} 
-                  className="w-20 h-20 rounded mr-4"
+              <View style={styles.itemContainer}>
+                <Image
+                  source={{ uri: item.image }}
+                  style={styles.image}
+                  resizeMode="cover"
                 />
-                <View className="flex-1">
-                  <Text className="font-semibold">{item.name}</Text>
+                <View style={styles.itemInfo}>
+                  <Text style={styles.itemName}>{item.name}</Text>
                   <Text>Qty: {item.quantity}</Text>
-                  <Text className="text-gray-600">${item.price.toFixed(2)}</Text>
+                  <Text style={styles.itemPrice}>
+                    ${item.price.toFixed(2)}
+                  </Text>
                 </View>
                 <TouchableOpacity
                   onPress={() => removeItem(item._id)}
-                  className="bg-red-500 px-3 py-1 rounded"
+                  style={styles.removeButton}
                 >
-                  <Text className="text-white">Remove</Text>
+                  <Text style={styles.removeText}>Remove</Text>
                 </TouchableOpacity>
               </View>
             )}
           />
-
-          <View className="mt-4 pt-4 border-t border-gray-200">
-            <Text className="text-xl font-bold text-right mb-4">
+          <View style={styles.totalContainer}>
+            <Text style={styles.totalText}>
               Total: ${total.toFixed(2)}
             </Text>
             <Button
               title="Proceed to Checkout"
-              onPress={() => navigation.navigate('Checkout')}
+              onPress={() => navigation.navigate("Checkout")}
             />
           </View>
         </>
       )}
     </View>
-  )
-}
+  );
+};
 
-export default CartScreen
+export default CartScreen;
+
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    padding: 16,
+  },
+  centered: {
+    flex: 1,
+    justifyContent: "center",
+    alignItems: "center",
+  },
+  title: {
+    fontSize: 24,
+    fontWeight: "bold",
+    marginBottom: 16,
+  },
+  emptyText: {
+    fontSize: 16,
+    marginBottom: 16,
+  },
+  itemContainer: {
+    flexDirection: "row",
+    alignItems: "center",
+    marginBottom: 16,
+    paddingBottom: 16,
+    borderBottomWidth: 1,
+    borderBottomColor: "#ccc",
+  },
+  image: {
+    width: 80,
+    height: 80,
+    borderRadius: 8,
+    marginRight: 12,
+  },
+  itemInfo: {
+    flex: 1,
+  },
+  itemName: {
+    fontWeight: "bold",
+    fontSize: 16,
+  },
+  itemPrice: {
+    color: "#555",
+  },
+  removeButton: {
+    backgroundColor: "#e63946",
+    paddingVertical: 6,
+    paddingHorizontal: 12,
+    borderRadius: 4,
+  },
+  removeText: {
+    color: "#fff",
+  },
+  totalContainer: {
+    marginTop: 16,
+    paddingTop: 16,
+    borderTopWidth: 1,
+    borderTopColor: "#ccc",
+  },
+  totalText: {
+    fontSize: 18,
+    fontWeight: "bold",
+    textAlign: "right",
+    marginBottom: 12,
+  },
+});

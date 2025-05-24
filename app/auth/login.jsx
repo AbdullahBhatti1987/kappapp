@@ -441,66 +441,72 @@
 //   },
 // });
 
-
-
 import Button from "@/components/Button";
+import LoadingModal from "@/components/LoadingModal";
 import API from "@/utils/api";
+import MaterialIcons from '@expo/vector-icons/MaterialIcons';
 import { Link, useRouter } from "expo-router";
-import React, { useState } from "react";
+import React, { useContext, useRef, useState } from "react";
 import {
-  ActivityIndicator,
   Alert,
   Dimensions,
   Image,
+  Keyboard,
   KeyboardAvoidingView,
-  Modal,
   Platform,
   ScrollView,
   StyleSheet,
   Text,
   TextInput,
   TouchableWithoutFeedback,
-  View,
-  Keyboard,
+  View
 } from "react-native";
-import { setAuthData, clearAuthData } from '@/utils/storage';
-import LoadingModal from "@/components/LoadingModal";
+import basicColors from "@/content/globalcss";
+import { AuthContext } from "@/context/AuthContext";
+
 
 const { width, height } = Dimensions.get("window");
 
-export default function LoginScreen() {
+function LoginScreen() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
-  const [loading, setLoading] = useState(false);
+  const [emailFocused, setEmailFocused] = useState(false);
+  const [passwordFocused, setPasswordFocused] = useState(false);
+  
   const router = useRouter();
+  const emailRef = useRef();
+  const passwordRef = useRef();
 
-const handleLogin = async () => {
-  setError("");
-  setLoading(true);
-  try {
-    const res = await API.post("/auth/login", { email, password });
-    const { token, user } = res.data;
+    const {setUser, setToken, loading, setLoading} = useContext(AuthContext)
+  
+  const handleLogin = async () => {
+    setError("");
+    setLoading(true);
+    try {
+      const res = await API.post("/auth/login", { email, password });
+      const { token, user } = res.data;
 
-    if (!token || !user || !user._id) {
-      throw new Error("User not found or invalid login.");
+      if (!token || !user) {
+        throw new Error("User not found or invalid login.");
+      }
+      await setToken(token, user); // ✅ recommended
+      Alert.alert("Success", "Login successful!");
+      router.replace("(tabs)");
+    } catch (err) {
+      const message =
+        err?.response?.data?.message || err?.message || "Login failed.";
+      setError(message);
+
+      await clearAuthData(); // ✅ remove anything possibly stored
+    } finally {
+      setLoading(false);
     }
+  };
 
-    await setAuthData(token, user); // ✅ recommended
-
-    Alert.alert("Success", "Login successful!");
-    router.replace("(tabs)");
-  } catch (err) {
-    const message =
-      err?.response?.data?.message || err?.message || "Login failed.";
-    setError(message);
-
-    await clearAuthData(); // ✅ remove anything possibly stored
-  } finally {
-    setLoading(false);
-  }
-};
-
+const handleBack = () => {
+    router.replace('/welcome'); 
+  };
 
   return (
     <KeyboardAvoidingView
@@ -508,6 +514,15 @@ const handleLogin = async () => {
       style={styles.mainContainer}
       keyboardVerticalOffset={Platform.OS === "ios" ? 60 : 0}
     >
+       <View>
+      <MaterialIcons 
+        name="arrow-back" 
+        onPress={handleBack} 
+        style={styles.backButton} 
+        size={28} 
+        color="black" 
+      />
+    </View>
       <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
         <ScrollView
           contentContainerStyle={styles.scrollContainer}
@@ -515,10 +530,20 @@ const handleLogin = async () => {
         >
           {/* Logo */}
           <View style={styles.container}>
-            <View style={styles.logoContainer}>
+            <View
+              style={{
+                justifyContent: "center",
+                alignItems: "center",
+                marginBottom: 40,
+              }}
+            >
               <Image
                 source={require("@/assets/images/kure.png")}
-                style={styles.logo}
+                style={{
+                  width: width / 3,
+                  height: height / 6,
+                  resizeMode: "contain",
+                }}
               />
             </View>
 
@@ -527,22 +552,30 @@ const handleLogin = async () => {
 
             {/* Form Inputs */}
             <TextInput
+              ref={emailRef}
               placeholder="Email"
               value={email}
               onChangeText={setEmail}
               keyboardType="email-address"
-              style={styles.input}
+              style={[styles.input, emailFocused && styles.inputFocused]}
               autoCapitalize="none"
               returnKeyType="next"
+              onSubmitEditing={() => passwordRef.current.focus()}
+              blurOnSubmit={false}
+              onFocus={() => setEmailFocused(true)}
+              onBlur={() => setEmailFocused(false)}
             />
             <TextInput
+              ref={passwordRef}
               placeholder="Password"
               value={password}
               onChangeText={setPassword}
               secureTextEntry
-              style={styles.input}
+              style={[styles.input, passwordFocused && styles.inputFocused]}
               returnKeyType="done"
               onSubmitEditing={handleLogin}
+              onFocus={() => setPasswordFocused(true)}
+              onBlur={() => setPasswordFocused(false)}
             />
 
             {!!error && <Text style={styles.error}>{error}</Text>}
@@ -563,8 +596,7 @@ const handleLogin = async () => {
             </View>
 
             {/* Loading Modal */}
-          <LoadingModal visible={loading} message="Logging in..." />
-
+            <LoadingModal visible={loading} message="Logging in..." />
           </View>
         </ScrollView>
       </TouchableWithoutFeedback>
@@ -573,13 +605,18 @@ const handleLogin = async () => {
 }
 
 const styles = StyleSheet.create({
-  mainContainer: { flex: 1 },
+  mainContainer: { flex: 1, backgroundColor: "white" },
   scrollContainer: { flexGrow: 1, justifyContent: "center" },
-  container: { 
+  container: {
     flex: 1,
     justifyContent: "center",
     padding: 20,
-    paddingBottom: 40 // Add extra padding at bottom for keyboard
+    paddingBottom: 40, // Add extra padding at bottom for keyboard
+  },
+  backButton:{
+    top: 20,
+    left: 10,
+    padding: 10,
   },
   heading: {
     fontSize: 24,
@@ -590,17 +627,24 @@ const styles = StyleSheet.create({
   input: {
     borderWidth: 1,
     borderColor: "#ccc",
-    marginBottom: 15,
-    padding: 10,
+    marginBottom: 10,
+    paddingVertical: 10,
+    paddingHorizontal: 12, // instead of padding & paddingLeft
     borderRadius: 5,
+    backgroundColor: "white",
+  },
+  inputFocused: {
+    borderColor: basicColors.themeColor,
+    backgroundColor: "#fff",
   },
   error: { color: "red", marginBottom: 10, textAlign: "center" },
   linkRow: { flexDirection: "row", marginTop: 10, justifyContent: "center" },
   link: { color: "blue" },
-  logoContainer: {
+  loadingOverlay: {
+    flex: 1,
+    backgroundColor: "rgba(0,0,0,0.3)",
     justifyContent: "center",
     alignItems: "center",
-    marginBottom: 40,
   },
   logo: {
     width: width / 3,
@@ -620,3 +664,5 @@ const styles = StyleSheet.create({
     alignItems: "center",
   },
 });
+
+export default LoginScreen;

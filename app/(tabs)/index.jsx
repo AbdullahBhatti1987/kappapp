@@ -180,7 +180,11 @@ export default function HomeScreen() {
   };
 
   return (
-    <LinearGradient colors={["#c4def6", "#1273de"]} style={styles.background}>
+    <LinearGradient
+      colors={["#c4def6", "#1273de"]}
+      style={styles.background}
+      // nestedScrollEnabled={false}
+    >
       <ScrollView>
         <View style={styles.slider}>
           <ImageSlider />
@@ -190,16 +194,18 @@ export default function HomeScreen() {
           <SearchBar onSearch={handleSearch} />
         </View>
 
-        {/* <View style={styles.categoryBox}>
+        <View style={styles.categoryBox}>
           <ChipsFilter
             categories={categories}
             onSelect={handleCategorySelect}
           />
-          <Heading text={selectedCategory} />
-        </View> */}
+          {/* <Heading text={selectedCategory} /> */}
+        </View>
+      </ScrollView>
 
-        {/* <View>
+        {/* <ScrollView nestedScrollEnabled={true}> */}
           <FlatList
+            nestedScrollEnabled={true}
             data={
               selectedCategory === "All"
                 ? products
@@ -214,8 +220,7 @@ export default function HomeScreen() {
               </View>
             )}
           />
-        </View> */}
-      </ScrollView>
+        {/* </ScrollView> */}
     </LinearGradient>
   );
 }
@@ -246,5 +251,6 @@ const styles = StyleSheet.create({
   },
   categoryBox: {
     // gap: 2,
+    marginBottom: 10,
   },
 });

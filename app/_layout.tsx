@@ -81,7 +81,6 @@ import {
 } from "@react-navigation/native";
 import { useFonts } from "expo-font";
 import { Stack } from "expo-router";
-import { ActivityIndicator, Text, View } from "react-native";
 import { PaperProvider } from "react-native-paper";
 
 export default function RootLayout() {
@@ -100,7 +99,7 @@ if (!loaded) return <AppLoader message="Initializing application..." />;
         <DrawerProvider>
           <CartProvider>
             <TopDrawer />
-            <Stack screenOptions={{ headerShown: false }} />
+            <Stack screenOptions={{ headerShown: false }}  />
           </CartProvider>
         </DrawerProvider>
         </PaperProvider>

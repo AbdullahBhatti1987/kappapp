@@ -6,7 +6,7 @@ export default function SearchBar({ onSearch }) {
   const [query, setQuery] = useState("");
 
   const handleSearch = () => {
-    if (typeof onSearch === "function" && query.trim()) {
+    if (onSearch === "function" && query.trim()) {
       onSearch(query.trim());
       Keyboard.dismiss();
     }
