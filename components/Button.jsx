@@ -1,6 +1,6 @@
 import basicColors from '@/content/globalcss';
 import React from 'react';
-import { StyleSheet, TouchableOpacity, Text } from 'react-native';
+import { StyleSheet, Text, TouchableOpacity } from 'react-native';
 
 function Button({ title, onPress, disabled, loading, style }) {
   return (
@@ -22,6 +22,7 @@ function Button({ title, onPress, disabled, loading, style }) {
 
 const styles = StyleSheet.create({
   button: {
+    width: '100%',
     borderRadius: 10,
     height: 45,
     backgroundColor: basicColors.themeColor,

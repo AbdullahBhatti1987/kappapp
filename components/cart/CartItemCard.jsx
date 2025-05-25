@@ -1,12 +1,12 @@
 import { MaterialIcons } from "@expo/vector-icons";
 import React, { useState } from "react";
 import {
-    Dimensions,
-    Image,
-    Pressable,
-    StyleSheet,
-    Text,
-    View,
+  Dimensions,
+  Image,
+  Pressable,
+  StyleSheet,
+  Text,
+  View,
 } from "react-native";
 
 const screenWidth = Dimensions.get("window").width;
@@ -21,7 +21,14 @@ export default function CartItemCard({ product, onRemove }) {
 
   return (
     <View style={styles.card}>
-      <Image source={{ uri: product.image }} style={styles.image} />
+      <Image
+        source={
+          typeof product.image === "string"
+            ? { uri: product.image }
+            : product.image
+        }
+        style={styles.image}
+      />
 
       <View style={styles.info}>
         <View style={styles.headerRow}>

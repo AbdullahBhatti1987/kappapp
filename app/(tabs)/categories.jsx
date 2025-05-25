@@ -1,109 +1,202 @@
-import { Platform, StyleSheet, Image } from 'react-native';
+import React, { useState } from "react";
+import {
+  View,
+  FlatList,
+  Text,
+  StyleSheet,
+  Pressable,
+  TextInput,
+  Keyboard,
+  Dimensions,
+} from "react-native";
+import { LinearGradient } from "expo-linear-gradient";
+import MaterialIcons from "@expo/vector-icons/MaterialIcons";
+import { categories, products } from "@/content/data";
+const { width } = Dimensions.get("window");
 
-import { Collapsible } from '@/components/Collapsible';
-import { ExternalLink } from '@/components/ExternalLink';
-import ParallaxScrollView from '@/components/ParallaxScrollView';
-import { ThemedText } from '@/components/ThemedText';
-import { ThemedView } from '@/components/ThemedView';
-import { IconSymbol } from '@/components/ui/IconSymbol';
+// Sample data
 
-export default function TabTwoScreen() {
+// Components
+const SearchBar = ({ onSearch }) => {
+  const [query, setQuery] = useState("");
+  const handleSearch = () => {
+    onSearch(query.trim().toLowerCase());
+    Keyboard.dismiss();
+  };
   return (
-    <ParallaxScrollView
-      headerBackgroundColor={{ light: '#D0D0D0', dark: '#353636' }}
-      headerImage={
-        <IconSymbol
-          size={310}
-          color="#808080"
-          name="chevron.left.forwardslash.chevron.right"
-          style={styles.headerImage}
-        />
-      }>
-      <ThemedView style={styles.titleContainer}>
-        <ThemedText type="title">Categories</ThemedText>
-      </ThemedView>
-      <ThemedText>This app includes example code to help you get started.</ThemedText>
-      <Collapsible title="File-based routing">
-        <ThemedText>
-          This app has two screens:{' '}
-          <ThemedText type="defaultSemiBold">app/(tabs)/index.tsx</ThemedText> and{' '}
-          <ThemedText type="defaultSemiBold">app/(tabs)/explore.tsx</ThemedText>
-        </ThemedText>
-        <ThemedText>
-          The layout file in <ThemedText type="defaultSemiBold">app/(tabs)/_layout.tsx</ThemedText>{' '}
-          sets up the tab navigator.
-        </ThemedText>
-        <ExternalLink href="https://docs.expo.dev/router/introduction">
-          <ThemedText type="link">Learn more</ThemedText>
-        </ExternalLink>
-      </Collapsible>
-      <Collapsible title="Android, iOS, and web support">
-        <ThemedText>
-          You can open this project on Android, iOS, and the web. To open the web version, press{' '}
-          <ThemedText type="defaultSemiBold">w</ThemedText> in the terminal running this project.
-        </ThemedText>
-      </Collapsible>
-      <Collapsible title="Images">
-        <ThemedText>
-          For static images, you can use the <ThemedText type="defaultSemiBold">@2x</ThemedText> and{' '}
-          <ThemedText type="defaultSemiBold">@3x</ThemedText> suffixes to provide files for
-          different screen densities
-        </ThemedText>
-        <Image source={require('@/assets/images/react-logo.png')} style={{ alignSelf: 'center' }} />
-        <ExternalLink href="https://reactnative.dev/docs/images">
-          <ThemedText type="link">Learn more</ThemedText>
-        </ExternalLink>
-      </Collapsible>
-      <Collapsible title="Custom fonts">
-        <ThemedText>
-          Open <ThemedText type="defaultSemiBold">app/_layout.tsx</ThemedText> to see how to load{' '}
-          <ThemedText style={{ fontFamily: 'SpaceMono' }}>
-            custom fonts such as this one.
-          </ThemedText>
-        </ThemedText>
-        <ExternalLink href="https://docs.expo.dev/versions/latest/sdk/font">
-          <ThemedText type="link">Learn more</ThemedText>
-        </ExternalLink>
-      </Collapsible>
-      <Collapsible title="Light and dark mode components">
-        <ThemedText>
-          This template has light and dark mode support. The{' '}
-          <ThemedText type="defaultSemiBold">useColorScheme()</ThemedText> hook lets you inspect
-          what the user&apos;s current color scheme is, and so you can adjust UI colors accordingly.
-        </ThemedText>
-        <ExternalLink href="https://docs.expo.dev/develop/user-interface/color-themes/">
-          <ThemedText type="link">Learn more</ThemedText>
-        </ExternalLink>
-      </Collapsible>
-      <Collapsible title="Animations">
-        <ThemedText>
-          This template includes an example of an animated component. The{' '}
-          <ThemedText type="defaultSemiBold">components/HelloWave.tsx</ThemedText> component uses
-          the powerful <ThemedText type="defaultSemiBold">react-native-reanimated</ThemedText>{' '}
-          library to create a waving hand animation.
-        </ThemedText>
-        {Platform.select({
-          ios: (
-            <ThemedText>
-              The <ThemedText type="defaultSemiBold">components/ParallaxScrollView.tsx</ThemedText>{' '}
-              component provides a parallax effect for the header image.
-            </ThemedText>
-          ),
-        })}
-      </Collapsible>
-    </ParallaxScrollView>
+    <View style={styles.searchContainer}>
+      <TextInput
+        style={styles.input}
+        placeholder="Search products..."
+        value={query}
+        onChangeText={setQuery}
+        returnKeyType="search"
+        onSubmitEditing={handleSearch}
+      />
+      <Pressable onPress={handleSearch} style={styles.iconWrapper}>
+        <MaterialIcons name="search" size={24} color="#333" />
+      </Pressable>
+    </View>
+  );
+};
+
+const ChipsFilter = ({ categories, selected, onSelect }) => {
+  return (
+    <View style={styles.chipList}>
+      {["All", ...categories].map((cat) => (
+        <Pressable
+          key={cat}
+          onPress={() => onSelect(cat)}
+          style={[
+            styles.chip,
+            selected === cat && styles.selectedChip,
+          ]}
+        >
+          <Text
+            style={[
+              styles.chipText,
+              selected === cat && styles.selectedChipText,
+            ]}
+          >
+            {cat}
+          </Text>
+        </Pressable>
+      ))}
+    </View>
+  );
+};
+
+const ProductCard = ({ product }) => (
+  <View style={styles.card}>
+    <Text style={styles.cardTitle}>{product.name}</Text>
+    <Text style={styles.cardCategory}>{product.category}</Text>
+  </View>
+);
+
+// Main Screen
+export default function HomeScreen() {
+  const [selectedCategory, setSelectedCategory] = useState("All");
+  const [searchQuery, setSearchQuery] = useState("");
+
+  const handleCategorySelect = (category) => {
+    setSelectedCategory(category);
+    setSearchQuery(""); // Clear search when selecting category
+  };
+
+  const handleSearch = (query) => {
+    setSearchQuery(query);
+  };
+
+  const filteredProducts = products.filter((product) => {
+    const matchesCategory =
+      selectedCategory === "All" || product.category === selectedCategory;
+    const matchesSearch =
+      !searchQuery ||
+      product.name.toLowerCase().includes(searchQuery.toLowerCase());
+    return matchesCategory && matchesSearch;
+  });
+
+  return (
+    <LinearGradient colors={["#c4def6", "#1273de"]} style={styles.background}>
+      <FlatList
+        ListHeaderComponent={
+          <>
+            <SearchBar onSearch={handleSearch} />
+            <ChipsFilter
+              categories={categories}
+              selected={selectedCategory}
+              onSelect={handleCategorySelect}
+            />
+          </>
+        }
+        data={filteredProducts}
+        numColumns={2}
+        keyExtractor={(item) => item.id}
+        contentContainerStyle={styles.listContainer}
+        renderItem={({ item }) => (
+          <View style={styles.cardWrapper}>
+            <ProductCard product={item} />
+          </View>
+        )}
+        showsVerticalScrollIndicator={false}
+      />
+    </LinearGradient>
   );
 }
 
 const styles = StyleSheet.create({
-  headerImage: {
-    color: '#808080',
-    bottom: -90,
-    left: -35,
-    position: 'absolute',
+  background: {
+    flex: 1,
+    paddingHorizontal: 12,
+    paddingTop: 40,
   },
-  titleContainer: {
-    flexDirection: 'row',
+  searchContainer: {
+    flexDirection: "row",
+    alignItems: "center",
+    backgroundColor: "#fff",
+    borderRadius: 10,
+    paddingHorizontal: 12,
+    borderWidth: 1,
+    borderColor: "#ccc",
+    marginBottom: 10,
+  },
+  input: {
+    flex: 1,
+    height: 40,
+    fontSize: 16,
+  },
+  iconWrapper: {
+    paddingLeft: 10,
+  },
+  chipList: {
+    flexDirection: "row",
+    flexWrap: "wrap",
     gap: 8,
+    marginBottom: 10,
+  },
+  chip: {
+    paddingHorizontal: 12,
+    paddingVertical: 6,
+    backgroundColor: "#e0e0e0",
+    borderRadius: 20,
+  },
+  selectedChip: {
+    backgroundColor: "#1273de",
+  },
+  chipText: {
+    color: "#333",
+    fontWeight: "500",
+  },
+  selectedChipText: {
+    color: "#fff",
+    fontWeight: "700",
+  },
+  listContainer: {
+    paddingBottom: 20,
+  },
+  cardWrapper: {
+    width: width / 2 - 20,
+    padding: 5,
+  },
+  card: {
+    backgroundColor: "#fff",
+    borderRadius: 10,
+    padding: 15,
+    alignItems: "center",
+    justifyContent: "center",
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 5,
+    elevation: 3,
+  },
+  cardTitle: {
+    fontSize: 16,
+    fontWeight: "600",
+  },
+  cardCategory: {
+    marginTop: 5,
+    fontSize: 12,
+    color: "#888",
   },
 });

@@ -16,9 +16,9 @@ export default function WelcomeScreen() {
       const { token } = await getAuthData();
 
       if (token) {
-        router.replace("/auth/login"); // 🚪 Send to login
-      } else {
         router.replace("(tabs)"); // ✅ User is logged in
+      } else {
+        router.replace("/auth/login"); // 🚪 Send to login
       }
 
       setLoading(false);

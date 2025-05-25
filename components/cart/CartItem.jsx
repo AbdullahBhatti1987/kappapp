@@ -1,18 +1,17 @@
 import MaterialIcons from "@expo/vector-icons/MaterialIcons";
 import React from "react";
 import {
-    Dimensions,
-    Image,
-    Pressable,
-    StyleSheet,
-    Text,
-    View,
+  Dimensions,
+  Image,
+  Pressable,
+  StyleSheet,
+  Text,
+  View,
 } from "react-native";
 
 const SCREEN_WIDTH = Dimensions.get("window").width;
 
 export default function CartItem({ item, onDelete }) {
-
   const renderRightActions = () => (
     <Pressable style={styles.deleteButton} onPress={() => onDelete(item.id)}>
       <MaterialIcons name="delete" size={24} color="white" />
@@ -25,7 +24,14 @@ export default function CartItem({ item, onDelete }) {
   return (
     <View renderRightActions={renderRightActions}>
       <View style={styles.card}>
-        <Image source={{ uri: item.image }} style={styles.image} />
+        <Image
+          source={
+            typeof product.image === "string"
+              ? { uri: product.image }
+              : product.image
+          }
+          style={styles.image}
+        />
 
         <View style={styles.info}>
           <Text style={styles.title}>{item.name}</Text>

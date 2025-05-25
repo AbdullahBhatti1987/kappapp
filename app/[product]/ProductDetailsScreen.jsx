@@ -64,7 +64,14 @@ const ProductDetailsScreen = () => {
 
   return (
     <ScrollView contentContainerStyle={styles.container}>
-      <Image source={{ uri: product.image }} style={styles.productImage} />
+     <Image
+  source={
+    typeof product.image === "string"
+      ? { uri: product.image }
+      : product.image
+  }
+  style={styles.productImage}
+/>
       <Pressable onPress={goBack} styles={styles.backButton}>
        <MaterialIcons name="arrow-back-ios" size={24} color="black" />
       </Pressable>

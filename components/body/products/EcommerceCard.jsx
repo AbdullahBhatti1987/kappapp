@@ -16,7 +16,14 @@ const EcommerceCard = ({
     <View style={styles.cardContainer}>
       {/* Product Image */}
       <View style={styles.imageContainer}>
-        <Image source={{ uri: imageUrl }} style={styles.productImage} />
+        <Image
+  source={
+    typeof product.image === "string"
+      ? { uri: product.image }
+      : product.image
+  }
+  style={styles.productImage}
+/>
         <TouchableOpacity style={styles.likeButton} onPress={onLikePress}>
           <MaterialIcons 
             name={isLiked ? "favorite" : "favorite-border"} 
